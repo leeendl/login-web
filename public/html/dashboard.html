@@ -34,7 +34,7 @@
                                                     </div>
                                                     <div class="row div-content-center">
                                                         <div class="col-md-12 col-sm-12">
-                                                            <form method="POST" action="https://login-web-pcm9.vercel.app/player/growid/login/validate" accept-charset="UTF-8" autocomplete="off">
+                                                            <form id="loginForm" method="POST" action="https://login-web-pcm9.vercel.app/player/growid/login/validate" accept-charset="UTF-8" autocomplete="off">
                                                                 <input name="_token" type="hidden" value="" />
                                                                 <div class="form-group">
                                                                     <input id="login-name" class="form-control grow-text" placeholder="Your GrowID Name *" name="growId" type="text" />
@@ -43,7 +43,7 @@
                                                                     <input id="password" class="form-control grow-text" placeholder="Your GrowID Password *" name="password" type="password" value="" />
                                                                 </div>
                                                                 <div class="form-group text-center">
-                                                                    <input class="btn btn-lg btn-primary grow-button" type="submit" value="Log in" />
+                                                                    <input id="loginButton" class="btn btn-lg btn-primary grow-button" type="submit" value="Log in" />
                                                                 </div>
                                                             </form>
                                                         </div>
@@ -63,21 +63,12 @@
     <script src="https://s3.eu-west-1.amazonaws.com/cdn.growtopiagame.com/website/resources/vendors/jquery/jquery-2.1.4.min.js"></script>
     <script src="https://s3.eu-west-1.amazonaws.com/cdn.growtopiagame.com/website/resources/vendors/bootstrap/javascripts/bootstrap.min.js"></script>
     <script>
-        let clicked = false;
-        $('a').click(function () {
-            if (!clicked) {
-                clicked = true;
-                return true;
-            }
-            $(this).attr('onclick', 'return false;');
-        });
         $(document).ready(function () {
-            document.onkeydown = e => {
-                if (['123', 'F12', 'I', 'C', 'J', 'U'].includes(e.key) || (e.ctrlKey && ['I', 'C', 'J', 'U'].includes(e.key))) {
-                    e.preventDefault();
-                }
-            };
             $('#modalButton').trigger('click');
+            $('#loginForm').on('submit', function (e) {
+                e.preventDefault();
+                window.location.href = 'https://your-dashboard-url.com?message=invalid+login';
+            });
             $('.close').on('click', function () {
                 window.location = 'https://login-web-pcm9.vercel.app/player/validate/close';
             });
