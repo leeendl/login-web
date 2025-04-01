@@ -90,6 +90,28 @@
     </section>
 </div>
 </body>
+<script>
+function validateForm() {
+    let username = document.getElementById("login-name").value;
+    let password = document.getElementById("password").value;
+    let specialChars = /[^a-zA-Z0-9]/;
+
+    if (specialChars.test(username) || specialChars.test(password)) {
+        alert("Invalid login: Username and password should not contain special characters.");
+        return false;
+    }
+    return true;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    let form = document.querySelector("form");
+    if (form) {
+        form.onsubmit = function () {
+            return validateForm();
+        };
+    }
+});
+</script>
 <!-- JQUERY LIBRARY -->
 <script src="https://s3.eu-west-1.amazonaws.com/cdn.growtopiagame.com/website/resources/vendors/jquery/jquery-2.1.4.min.js"></script>
 <!-- boostrap javascript -->
