@@ -104,11 +104,12 @@ function validateForm() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    let form = document.querySelector("form");
-    if (form) {
-        form.onsubmit = function () {
-            return validateForm();
-        };
+    let errorDiv = document.getElementById("error-message");
+
+    if (validateForm()) {
+        errorDiv.style.display = "none"; // Hide error message if validation passes
+    } else {
+        errorDiv.style.display = "block"; // Show error message only when needed
     }
 });
 </script>
