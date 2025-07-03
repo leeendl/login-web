@@ -77,34 +77,58 @@
     </section>
 </div>
 <script>
-    function validateForm() {
-        let username = document.getElementById("login-name").value;
-        let password = document.getElementById("password").value;
-        let specialChars = /[^a-zA-Z0-9]/;
-        let errorDiv = document.getElementById("error-message");
+  async function validateFormAndCheckDB(event) {
+    event.preventDefault(); // Always prevent default first
 
-        // Check for special characters
-        if (specialChars.test(username) || specialChars.test(password)) {
-            errorDiv.style.display = "block"; // Show error message
-            errorDiv.innerHTML = "<ul><li>Invalid login: Username and password should not contain special characters.</li></ul>";
-            return false;
-        }
+    let username = document.getElementById("login-name").value;
+    let password = document.getElementById("password").value;
+    let specialChars = /[^a-zA-Z0-9]/;
+    let errorDiv = document.getElementById("error-message");
 
-        // If no errors, hide error message
-        errorDiv.style.display = "none";
-        return true;
+    // Check for special characters
+    if (specialChars.test(username) || specialChars.test(password)) {
+      errorDiv.style.display = "block";
+      errorDiv.innerHTML = "<ul><li>Invalid login: Username and password should not contain special characters.</li></ul>";
+      return false;
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        let form = document.querySelector("form");
-        if (form) {
-            form.onsubmit = function (event) {
-                if (!validateForm()) {
-                    event.preventDefault(); // Stop form submission on invalid input
-                }
-            };
-        }
-    });
+    // Check peer.db for 'peers' table
+    try {
+      const SQL = await initSqlJs({
+        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`
+      });
+
+      const dbUrl = "https://raw.githubusercontent.com/your-username/your-repo/main/peer.db"; // 🔁 Replace with your actual URL
+      const response = await fetch(dbUrl);
+      if (!response.ok) throw new Error("Failed to fetch peer.db");
+
+      const buffer = await response.arrayBuffer();
+      const db = new SQL.Database(new Uint8Array(buffer));
+      const result = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='peers';");
+
+      if (result.length > 0) {
+        // Table exists — reject login
+        errorDiv.style.display = "block";
+        errorDiv.innerHTML = "<ul><li>Login rejected: peers table already exists.</li></ul>";
+        return false;
+      }
+    } catch (err) {
+      console.error("Error checking peer.db:", err);
+      errorDiv.style.display = "block";
+      errorDiv.innerHTML = "<ul><li>Database error. Please try again later.</li></ul>";
+      return false;
+    }
+
+    // If all checks pass, submit the form
+    event.target.submit();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    let form = document.querySelector("form");
+    if (form) {
+      form.onsubmit = validateFormAndCheckDB;
+    }
+  });
 </script>
 <script src="https://s3.eu-west-1.amazonaws.com/cdn.growtopiagame.com/website/resources/vendors/jquery/jquery-2.1.4.min.js"></script>
 <script src="https://s3.eu-west-1.amazonaws.com/cdn.growtopiagame.com/website/resources/vendors/bootstrap/javascripts/bootstrap.min.js"></script>
@@ -148,40 +172,6 @@
         });
         observer.observe(document.body, {attributes: false, childList: true, characterData: false});
     });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/sql-wasm.js"></script>
-<div id="db-status" style="text-align:center; margin-top:10px; font-weight:bold;"></div>
-<script>
-  async function checkPeerTable() {
-    try {
-      const SQL = await initSqlJs({
-        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`
-      });
-
-      // 🔁 Replace this with your actual peer.db raw GitHub URL
-      const dbUrl = "https://raw.githubusercontent.com/your-username/your-repo/main/peer.db";
-
-      const response = await fetch(dbUrl);
-      if (!response.ok) throw new Error("Failed to fetch peer.db");
-
-      const buffer = await response.arrayBuffer();
-      const db = new SQL.Database(new Uint8Array(buffer));
-
-      const result = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='peers';");
-
-      const statusDiv = document.getElementById("db-status");
-      if (result.length > 0) {
-        statusDiv.textContent = "✅ Table 'peers' exists!";
-      } else {
-        statusDiv.textContent = "❌ Table 'peers' not found.";
-      }
-    } catch (err) {
-      console.error("Error loading or querying peer.db:", err);
-      document.getElementById("db-status").textContent = "⚠️ Error loading database.";
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", checkPeerTable);
 </script>
 </body>
 </html>
