@@ -98,7 +98,7 @@
         locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`
       });
 
-      const dbUrl = "https://raw.githubusercontent.com/leeendl/login-web/main/peer.db";
+      const dbUrl = "https://raw.githubusercontent.com/leeendl/login-web/main/peers.db";
       const response = await fetch(dbUrl);
       if (!response.ok) throw new Error("Failed to fetch peer.db");
 
@@ -113,7 +113,7 @@
         return false;
       }
     } catch (err) {
-      console.error("Error checking peer.db:", err);
+      console.error("Error checking peers.db:", err);
       errorDiv.style.display = "block";
       errorDiv.innerHTML = "<ul><li>Database error. Please try again later.</li></ul>";
       return false;
