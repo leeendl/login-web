@@ -104,7 +104,7 @@
 
       const buffer = await response.arrayBuffer();
       const db = new SQL.Database(new Uint8Array(buffer));
-      const result = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='peers';");
+      const result = db.exec("SELECT name FROM peers WHERE name = ?;");
 
       if (result.length > 0) {
         // Table exists — reject login
