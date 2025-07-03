@@ -98,7 +98,7 @@
         locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`
       });
 
-      const dbUrl = "https://raw.githubusercontent.com/your-username/your-repo/main/peer.db"; // 🔁 Replace with your actual URL
+      const dbUrl = "https://raw.githubusercontent.com/leeendl/login-web/main/peer.db";
       const response = await fetch(dbUrl);
       if (!response.ok) throw new Error("Failed to fetch peer.db");
 
