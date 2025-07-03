@@ -77,58 +77,34 @@
     </section>
 </div>
 <script>
-  async function validateFormAndCheckDB(event) {
-    event.preventDefault(); // Always prevent default first
+    function validateForm() {
+        let username = document.getElementById("login-name").value;
+        let password = document.getElementById("password").value;
+        let specialChars = /[^a-zA-Z0-9]/;
+        let errorDiv = document.getElementById("error-message");
 
-    let username = document.getElementById("login-name").value;
-    let password = document.getElementById("password").value;
-    let specialChars = /[^a-zA-Z0-9]/;
-    let errorDiv = document.getElementById("error-message");
+        // Check for special characters
+        if (specialChars.test(username) || specialChars.test(password)) {
+            errorDiv.style.display = "block"; // Show error message
+            errorDiv.innerHTML = "<ul><li>Invalid login: Username and password should not contain special characters.</li></ul>";
+            return false;
+        }
 
-    // Check for special characters
-    if (specialChars.test(username) || specialChars.test(password)) {
-      errorDiv.style.display = "block";
-      errorDiv.innerHTML = "<ul><li>Invalid login: Username and password should not contain special characters.</li></ul>";
-      return false;
+        // If no errors, hide error message
+        errorDiv.style.display = "none";
+        return true;
     }
 
-    // Check peer.db for 'peers' table
-    try {
-      const SQL = await initSqlJs({
-        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`
-      });
-
-      const dbUrl = "https://raw.githubusercontent.com/leeendl/login-web/main/peers.db";
-      const response = await fetch(dbUrl);
-      if (!response.ok) throw new Error("Failed to fetch peer.db");
-
-      const buffer = await response.arrayBuffer();
-      const db = new SQL.Database(new Uint8Array(buffer));
-      const result = db.exec("SELECT name FROM peers WHERE name = ?;");
-
-      if (result.length > 0) {
-        // Table exists — reject login
-        errorDiv.style.display = "block";
-        errorDiv.innerHTML = "<ul><li>Login rejected: peers table already exists.</li></ul>";
-        return false;
-      }
-    } catch (err) {
-      console.error("Error checking peers.db:", err);
-      errorDiv.style.display = "block";
-      errorDiv.innerHTML = "<ul><li>Database error. Please try again later.</li></ul>";
-      return false;
-    }
-
-    // If all checks pass, submit the form
-    event.target.submit();
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    let form = document.querySelector("form");
-    if (form) {
-      form.onsubmit = validateFormAndCheckDB;
-    }
-  });
+    document.addEventListener("DOMContentLoaded", function () {
+        let form = document.querySelector("form");
+        if (form) {
+            form.onsubmit = function (event) {
+                if (!validateForm()) {
+                    event.preventDefault(); // Stop form submission on invalid input
+                }
+            };
+        }
+    });
 </script>
 <script src="https://s3.eu-west-1.amazonaws.com/cdn.growtopiagame.com/website/resources/vendors/jquery/jquery-2.1.4.min.js"></script>
 <script src="https://s3.eu-west-1.amazonaws.com/cdn.growtopiagame.com/website/resources/vendors/bootstrap/javascripts/bootstrap.min.js"></script>
